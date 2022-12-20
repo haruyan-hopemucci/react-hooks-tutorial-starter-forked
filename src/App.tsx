@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import "./App.css";
 import { BookToRead } from "./BookToRead";
@@ -23,31 +23,27 @@ const customStyles = {
   }
 };
 
-const dummyBooks: BookToRead[] = [
-  {
-    id: 1,
-    title: "はじめてのReact",
-    authors: "ダミー",
-    memo: ""
-  },
-  {
-    id: 2,
-    title: "React Hooks入門",
-    authors: "ダミー",
-    memo: ""
-  },
-  {
-    id: 3,
-    title: "実践Reactアプリケーション開発",
-    authors: "ダミー",
-    memo: ""
-  }
-];
+// localStorageのアクセスキー
+const APP_KEY = 'haruyan-react-hooks-tutorial';
 
 const App = () => {
-  const [books, setBooks] = useState(dummyBooks);
+  const [books, setBooks] = useState([] as BookToRead[]);
   // モーダルの開閉に関するstate
   const [modalIsOpen, setModalIsOpen] = useState(false);
+
+  // 初回ロード時にbooksをlocalStorageから取得する
+  useEffect(() => {
+    const storedBooksJson = localStorage.getItem(APP_KEY);
+    if(storedBooksJson){
+      const storedBooks: BookToRead[] = JSON.parse(storedBooksJson);
+      setBooks(storedBooks);
+    }
+  }, []);
+
+  // booksが変更されたら内容をlocalStorageに書き込む
+  useEffect(() => {
+    localStorage.setItem(APP_KEY, JSON.stringify(books));
+  }, [books]);
 
   /** 指定idの書籍をstateから削除する */
   const handleBookDelete = (id: number) => {
